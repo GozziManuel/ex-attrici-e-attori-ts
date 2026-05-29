@@ -273,3 +273,24 @@ async function getActors(numberArray: number[]): Promise<(Actor | null)[]> {
   }
 }
 getActors([2, 3, 4, 5]);
+
+// BONUS 3
+// Crea la funzione createRandomCouple che usa getAllActresses e
+//  getAllActors per restituire un’array che ha sempre due elementi:
+//  al primo posto una Actress casuale e al secondo posto un Actor casuale.
+async function createRandomCouple(): Promise<[Actress, Actor] | null> {
+  try {
+    const result = await getAllActor();
+    const resultActress = await getAllActresses();
+
+    return [
+      resultActress[Math.floor(Math.random() * resultActress.length)],
+      result[Math.floor(Math.random() * result.length)],
+    ];
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+const randomResult = await createRandomCouple();
+console.log(randomResult);
