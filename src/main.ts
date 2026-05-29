@@ -147,10 +147,40 @@ getActresses([2, 3, 4, 5]);
 
 // 🎯 BONUS 1
 // Crea le funzioni:
-
-// createActress
-// updateActress
 // Utilizza gli Utility Types:
 
+// createActress
 // Omit: per creare un'attrice senza passare id, che verrà generato casualmente.
+function CreateActress(dati: Omit<Actress, "id">): Actress {
+  return {
+    id: Math.random() * (100 - 1) + 1,
+    ...dati,
+  };
+}
+// updateActress
 // Partial: per permettere l’aggiornamento di qualsiasi proprietà tranne id e name.
+function updateActress(actress: Actress, fieldsToUptade: Partial<Actress>) {
+  return { ...actress, ...fieldsToUptade, name: actress.name, id: actress.id };
+}
+
+//
+//
+// BONUS 2
+type ActorNationality =
+  | "New Zealand"
+  | "Hong Kong"
+  | "German"
+  | "Canadian"
+  | "Irish"
+  | "Scottish";
+// Crea un tipo Actor, che estende Person con le seguenti differenze rispetto ad Actress:
+// known_for: una tuple di 3 stringhe
+// awards: array di una o due stringhe
+// nationality: le stesse di Actress più:
+// Scottish, New Zealand, Hong Kong, German, Canadian, Irish.
+// Implementa anche le versioni getActor, getAllActors, getActors, createActor, updateActor.
+type Actor = Person & {
+  known_for: [string, string, string];
+  awards: [string] | [string, string];
+  nationality: Nationality & ActorNationality;
+};
