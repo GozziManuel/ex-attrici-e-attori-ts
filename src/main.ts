@@ -51,14 +51,14 @@ function isActress(dati: unknown): dati is Actress {
     typeof dati.name === "string" &&
     "birth_year" in dati &&
     typeof dati.birth_year === "number" &&
-    "death_year" in dati &&
-    typeof dati.death_year === "number" &&
+    (!("death_year" in dati) || typeof dati.death_year === "number") &&
     "biography" in dati &&
     typeof dati.biography === "string" &&
     "image" in dati &&
     typeof dati.image === "string" &&
     "most_famous_movies" in dati &&
-    typeof dati.most_famous_movies === "object" &&
+    dati.most_famous_movies instanceof Array &&
+    dati.most_famous_movies.length === 3 &&
     "awards" in dati &&
     typeof dati.awards === "string" &&
     "nationality" in dati &&
@@ -87,7 +87,7 @@ async function getActress(id: number): Promise<Actress | null> {
     throw new Error("Tipo non valido");
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error("not a valid URL");
+      console.error(error);
     }
     return null;
   }
@@ -184,3 +184,92 @@ type Actor = Person & {
   awards: [string] | [string, string];
   nationality: Nationality & ActorNationality;
 };
+function isActor(dati: unknown): dati is Actor {
+  if (
+    dati &&
+    typeof dati === "object" &&
+    "id" in dati &&
+    typeof dati.id === "number" &&
+    "name" in dati &&
+    typeof dati.name === "string" &&
+    "birth_year" in dati &&
+    typeof dati.birth_year === "number" &&
+    (!("death_year" in dati) || typeof dati.death_year === "number") &&
+    "biography" in dati &&
+    typeof dati.biography === "string" &&
+    "image" in dati &&
+    typeof dati.image === "string" &&
+    "known_for" in dati &&
+    dati.known_for instanceof Array &&
+    dati.known_for.length === 3 &&
+    dati.known_for.every((e) => typeof e === "string") &&
+    "awards" in dati &&
+    dati.awards instanceof Array &&
+    (dati.awards.length === 1 || dati.awards.length === 2) &&
+    dati.known_for.every((e) => typeof e === "string") &&
+    "nationality" in dati &&
+    typeof dati.nationality === "string"
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function getActor(id: number): Promise<Actor | null> {
+  try {
+    const response = await fetch(`http://localhost:3333/actors/${id}`);
+    const result: unknown = await response.json();
+    console.log(result);
+
+    if (isActor(result)) {
+      return result as Actor;
+    }
+    throw new Error("Tipo non valido");
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error);
+    }
+    return null;
+  }
+}
+getActor(2);
+//
+//
+//
+
+async function getAllActor(): Promise<Actor[]> {
+  try {
+    const response = await fetch(`http://localhost:3333/actors`);
+    const result: unknown = await response.json();
+    if (!(result instanceof Array)) {
+      throw new Error("not an array");
+    }
+    const dati = result.filter((e) => e);
+    console.log(dati);
+    return dati;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error("");
+    }
+    return [];
+  }
+}
+getAllActor();
+//
+//
+//
+
+async function getActors(numberArray: number[]): Promise<(Actor | null)[]> {
+  try {
+    const ids = numberArray.map((el) => getActor(el));
+    const promises = await Promise.all(ids);
+    return promises;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error);
+    }
+    return [];
+  }
+}
+getActors([2, 3, 4, 5]);
